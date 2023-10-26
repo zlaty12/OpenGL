@@ -36,8 +36,22 @@ int main()
 	{
 		-0.5, -0.5 * float(sqrt(3)) / 3,0.0f, // Lower left
 		0.5f, -0.5f * float(sqrt(3)) / 3, 0.f, // Lower right
-		0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f // Upper right
+		0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // Upper right
+		-0.5f / 2, 0.5f * float(sqrt(3))  / 6, 0.0f, // inner left
+		0.5f / 2, 0.5f * float(sqrt(3))  / 6, 0.0f, // inner right
+		0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f // inner down
+
+
 	};
+
+	// adding indeces
+	GLuint indeces[] =
+	{
+		0,3,5, // lower left triangle
+		3,2,4, // lower riht triangle 
+		5,4,1 // upper triangle
+	};
+
 
 
 
@@ -89,11 +103,12 @@ int main()
 
 
 	// Create reference to Vertex Array Object and Vertex Buffer Object
-	GLuint VAO, VBO;
+	GLuint VAO, VBO, EBO;
 
-	// Generate VAO and VBO
+	// Generate VAO and VBO and EBO
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
 
 	// Bind Vortex Array Object
 	glBindVertexArray(VAO);
@@ -103,6 +118,10 @@ int main()
 	// Add the verteces to the VBO
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+	// Binding EBO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	// Add the indeces to the EBO
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indeces), indeces, GL_STATIC_DRAW);
 	// Configer Vertex Attributs
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	// Enable the Vertex ATTributes
@@ -111,6 +130,7 @@ int main()
 	// Bind VBO and VAO to 0 so it doesnt modify the exising VBO na VAO
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
 	// change window background color
@@ -131,7 +151,7 @@ int main()
 		// Bind VAO so OpenGL know to use it
 		glBindVertexArray(VAO);
 		// Draw the triangle using the GL_Triangles primitive 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 		glfwSwapBuffers(window);
 		// Takes care of GLFW evnets
 		glfwPollEvents();
@@ -140,6 +160,7 @@ int main()
 	// Delete all the objects 
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 	glDeleteProgram(shaderProgram);
 
 
