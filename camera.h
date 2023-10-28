@@ -18,6 +18,8 @@ class Camera
 		glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
 		glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
 
+		bool ClickCamera = true;
+
 		int width;
 		int hight;
 
