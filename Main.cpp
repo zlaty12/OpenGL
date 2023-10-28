@@ -53,7 +53,7 @@ int main()
 	// Error check for window
 	if (window == NULL)
 	{
-		std::cout << " Window faild" << std::endl;
+		std::cout << "Window ERROR" << std::endl;
 		glfwTerminate();
 		return -1;
 	}

@@ -19,45 +19,52 @@ void Camera::Matrix(float FOVdeg, float NearPlane, float FarPlaine, Shader& shad
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(projection * view));
 
 }
-
+// Adding camera inputs
 void Camera::Inputs(GLFWwindow* window)
-{
+{	// pressing W will make the camera go forward
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
+		
 		Position += speed * Orientation;
 	}
+	// Pressing the A key will make the camera go left
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		Position += speed * -glm::normalize(glm::cross(Orientation,UP));
 	}
+	// pressing the S key will make the camera go back
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		Position += speed * -Orientation;
 	}
+	// pressing the D key will make the camera go right
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		Position += speed * glm::normalize(glm::cross(Orientation, UP));
 	}
 
-
+	// pressing space will make the camera go up
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		Position += speed * UP;
 	}
+	// pressing control will make the camera go down
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
 		Position += speed * -UP;
 	}
+	// pressing shift will make the camra go faster
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		speed = 0.4f;
 	}
+	// relising shift wiill make the camrera moving at normal speed
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		speed = 0.1f;
 	}
 
-
+	
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
