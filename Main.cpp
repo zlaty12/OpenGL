@@ -7,26 +7,31 @@
 #include"VAO.h"
 #include"VBO.h"
 #include"EBO.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-
+const unsigned int width = 800;
+const unsigned int hight = 800;
 
 // Vertices 
 GLfloat vertices[] =
-{
-	//      Cordinets                /  Color           
-	-0.5f, -0.5f, 0.0f,			    	0.8f, 0.3f, 0.02f,  0.0f, 0.0f,	 // Lower left corner
-	-0.5f, 0.5f, 0.0f,					1.0f, 0.3f, 0.25f,	0.0f,1.0f,     // Lower right corner
-	 0.5f, 0.5f,0.0f,			        0.6f, 0.7f, 0.3f,	1.0f,1.0f,     // Upper corner
-     0.5f, -0.5f,0.0f,	                0.5f, 0.3f, 0.3f,	1.0f, 0.0f     // Inner left
-	
+{ //     COORDINATES     /        COLORS      /   TexCoord  //
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
 };
 
-// Indices for vertices order
+// Indices 
 GLuint indices[] =
 {
-	0, 2, 1, // Lower left triangle
-	0, 3, 2, // Lower right triangle
-	
+	0, 1, 2,
+	0, 2, 3,
+	0, 1, 4,
+	1, 2, 4,
+	2, 3, 4,
+	3, 0, 4
 };
 
 
@@ -57,7 +62,7 @@ int main()
 	//Load GLAD 
 	gladLoadGL();
 	// Specify the viewport of OpenGL in the Window
-	glViewport(0, 0, 800, 800);
+	glViewport(0, 0, width, hight);
 
 
 
@@ -93,21 +98,54 @@ int main()
 	shaderProgram.Activate();
 	glUniform1i(tex0Uni, 0);
 
+	float rotation = 0.0f;
+	double prevTime = glfwGetTime();
+
+	glEnable(GL_DEPTH_TEST);
+
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
 		// Background color
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// cler the back buffer and assign the new color
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Tell OpenGL what shader program to use
 		shaderProgram.Activate();
+
+		double crntTime = glfwGetTime();
+
+		if (crntTime - prevTime >= 1 / 60)
+		{
+			rotation += 0.5f;
+			prevTime = crntTime;
+		}
+
+
+
+
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 proj = glm::mat4(1.0f);
+
+
+		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::translate(view, glm::vec3(0.0f,-0.5f,-2.0f));
+		proj = glm::perspective(glm::radians(45.f), (float)(width / hight), 0.1f, 100.0f);
+
+		int ModelLococation = glGetUniformLocation(shaderProgram.ID, "model");
+		glUniformMatrix4fv(ModelLococation, 1, GL_FALSE, glm::value_ptr(model));
+		int ViewLocation = glGetUniformLocation(shaderProgram.ID, "view");
+		glUniformMatrix4fv(ViewLocation, 1, GL_FALSE, glm::value_ptr(view));
+		int ProjLocation = glGetUniformLocation(shaderProgram.ID, "proj");
+		glUniformMatrix4fv(ProjLocation, 1, GL_FALSE, glm::value_ptr(proj));
+
 		// Bind texture
 		Pirate.Bind();
 		// Bind the VAO 
 		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices)/ sizeof(int), GL_UNSIGNED_INT, 0);
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// GLFW events
